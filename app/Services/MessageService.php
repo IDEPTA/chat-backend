@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
-use App\Http\Requests\MessageRequest;
 use Exception;
 use App\Models\Message;
+use App\Events\MessageCreated;
+use App\Http\Requests\MessageRequest;
 
 class MessageService
 {
@@ -18,40 +19,42 @@ class MessageService
 
     public function index()
     {
-        $chats = Message::with("user", "chat")->get();
-        return $chats;
+        $messages = Message::with("user", "chat")->get();
+        return $messages;
     }
 
     public function show(string $id)
     {
-        $chat = Message::with("user", "chat")->find($id);
+        $message = Message::with("user", "chat")->find($id);
 
-        if (is_null($chat)) {
+        if (is_null($message)) {
             throw new Exception('Сообщение не найдено', 404);
         }
-        return $chat;
+        return $message;
     }
 
     public function create(MessageRequest $request)
     {
         $data = $request->validated();
-        $newChat = Message::create($data);
+        $newMessage = Message::create($data);
+        MessageCreated::dispatch($newMessage->load("user", "chat"));
 
-        return $newChat;
+
+        return $newMessage;
     }
 
     public function update(MessageRequest $request, string $id)
     {
         $data = $request->validated();
-        $updatedChat = $this->show($id);
-        $updatedChat->update($data);
+        $updatedMessage = $this->show($id);
+        $updatedMessage->update($data);
 
-        return $updatedChat;
+        return $updatedMessage;
     }
 
     public function delete(string $id)
     {
-        $deletedChat = $this->show($id);
-        $deletedChat->delete();
+        $deletedMessage = $this->show($id);
+        $deletedMessage->delete();
     }
 }

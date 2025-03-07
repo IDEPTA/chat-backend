@@ -16,7 +16,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post("register",  "register");
 });
 
-Route::controller(ChatController::class)->middleware('auth:sanctum')->group(function () {
+Route::controller(ChatController::class)->group(function () {
     Route::get("chats",  "index");
     Route::get("chats/{id}",  "show");
     Route::post("chats",  "create");
@@ -24,7 +24,7 @@ Route::controller(ChatController::class)->middleware('auth:sanctum')->group(func
     Route::delete("chats/{id}",  "delete");
 });
 
-Route::controller(MessageController::class)->middleware('auth:sanctum')->group(function () {
+Route::controller(MessageController::class)->group(function () {
     Route::get("messages",  "index");
     Route::get("messages/{id}",  "show");
     Route::post("messages",  "create");
