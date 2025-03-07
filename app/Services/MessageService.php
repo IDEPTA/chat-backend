@@ -5,6 +5,8 @@ namespace App\Services;
 use Exception;
 use App\Models\Message;
 use App\Events\MessageCreated;
+use App\Events\MessageDeleted;
+use App\Events\MessageUpdated;
 use App\Http\Requests\MessageRequest;
 
 class MessageService
@@ -48,13 +50,14 @@ class MessageService
         $data = $request->validated();
         $updatedMessage = $this->show($id);
         $updatedMessage->update($data);
-
+        MessageUpdated::dispatch($updatedMessage->load("user", "chat"));
         return $updatedMessage;
     }
 
     public function delete(string $id)
     {
         $deletedMessage = $this->show($id);
+        MessageDeleted::dispatch($deletedMessage);
         $deletedMessage->delete();
     }
 }
